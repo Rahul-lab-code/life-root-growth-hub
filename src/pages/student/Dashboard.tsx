@@ -155,7 +155,9 @@ const StudentDashboard: React.FC = () => {
                 </span>
                 <span className="text-sm text-muted-foreground">{mockStats.ecoPoints} pts</span>
               </div>
-              <Progress value={Math.round((mockStats.ecoPoints / mockStats.totalPoints) * 100)} className="h-2 bg-liferoot-earth-light" indicatorClassName="bg-liferoot-green" />
+              <Progress value={Math.round((mockStats.ecoPoints / mockStats.totalPoints) * 100)} 
+                        className="h-2 bg-liferoot-earth-light" 
+                        indicatorClassName="bg-liferoot-green" />
             </div>
             <div>
               <div className="flex justify-between mb-1">
@@ -165,7 +167,9 @@ const StudentDashboard: React.FC = () => {
                 </span>
                 <span className="text-sm text-muted-foreground">{mockStats.eqPoints} pts</span>
               </div>
-              <Progress value={Math.round((mockStats.eqPoints / mockStats.totalPoints) * 100)} className="h-2 bg-liferoot-earth-light" indicatorClassName="bg-liferoot-blue" />
+              <Progress value={Math.round((mockStats.eqPoints / mockStats.totalPoints) * 100)} 
+                        className="h-2 bg-liferoot-earth-light" 
+                        indicatorClassName="bg-liferoot-blue" />
             </div>
             <div>
               <div className="flex justify-between mb-1">
@@ -175,7 +179,9 @@ const StudentDashboard: React.FC = () => {
                 </span>
                 <span className="text-sm text-muted-foreground">{mockStats.valuePoints} pts</span>
               </div>
-              <Progress value={Math.round((mockStats.valuePoints / mockStats.totalPoints) * 100)} className="h-2 bg-liferoot-earth-light" indicatorClassName="bg-liferoot-yellow" />
+              <Progress value={Math.round((mockStats.valuePoints / mockStats.totalPoints) * 100)} 
+                        className="h-2 bg-liferoot-earth-light" 
+                        indicatorClassName="bg-liferoot-yellow" />
             </div>
           </div>
         </CardContent>

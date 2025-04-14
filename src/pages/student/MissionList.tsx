@@ -21,6 +21,7 @@ const mockMissions = {
       points: 50,
       progress: 30,
       daysLeft: 5,
+      isCompleted: false,
     },
     {
       id: '2',
@@ -30,6 +31,7 @@ const mockMissions = {
       difficulty: 'easy' as const,
       timeEstimate: '2 days',
       points: 30,
+      isCompleted: false,
     },
     {
       id: '3',
@@ -39,6 +41,7 @@ const mockMissions = {
       difficulty: 'hard' as const,
       timeEstimate: '3 days',
       points: 60,
+      isCompleted: false,
     },
     {
       id: '4',
@@ -48,6 +51,7 @@ const mockMissions = {
       difficulty: 'hard' as const,
       timeEstimate: '1 week',
       points: 80,
+      isCompleted: false,
     },
     {
       id: '5',
@@ -71,6 +75,7 @@ const mockMissions = {
       points: 40,
       progress: 60,
       daysLeft: 3,
+      isCompleted: false,
     },
     {
       id: '2',
@@ -80,6 +85,7 @@ const mockMissions = {
       difficulty: 'medium' as const,
       timeEstimate: '1 week',
       points: 50,
+      isCompleted: false,
     },
     {
       id: '3',
@@ -89,6 +95,7 @@ const mockMissions = {
       difficulty: 'medium' as const,
       timeEstimate: '3 days',
       points: 45,
+      isCompleted: false,
     },
     {
       id: '4',
@@ -98,6 +105,7 @@ const mockMissions = {
       difficulty: 'hard' as const,
       timeEstimate: '4 days',
       points: 70,
+      isCompleted: false,
     },
   ],
   values: [
@@ -119,6 +127,7 @@ const mockMissions = {
       difficulty: 'easy' as const,
       timeEstimate: '1 week',
       points: 35,
+      isCompleted: false,
     },
     {
       id: '3',
@@ -128,6 +137,7 @@ const mockMissions = {
       difficulty: 'medium' as const,
       timeEstimate: '1 day',
       points: 50,
+      isCompleted: false,
     },
     {
       id: '4',
@@ -137,6 +147,7 @@ const mockMissions = {
       difficulty: 'hard' as const,
       timeEstimate: '3 days',
       points: 65,
+      isCompleted: false,
     },
   ],
 };
@@ -257,7 +268,7 @@ const MissionList: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {mockMissions[activeTab as keyof typeof mockMissions]
-                .filter(mission => mission.progress === undefined && !m.isCompleted)
+                .filter(mission => mission.progress === undefined && !mission.isCompleted)
                 .map((mission) => (
                   <MissionCard key={mission.id} mission={mission} />
                 ))}
