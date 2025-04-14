@@ -194,6 +194,29 @@ const MissionList: React.FC = () => {
       default: return 'Complete missions to earn points and badges';
     }
   };
+
+  // Helper function to check if a mission has progress
+  const missionHasProgress = (mission: any): boolean => {
+    return mission.progress !== undefined;
+  };
+
+  // Get active missions for current category
+  const getActiveMissions = () => {
+    return mockMissions[activeTab as keyof typeof mockMissions]
+      .filter(mission => missionHasProgress(mission) && !mission.isCompleted);
+  };
+
+  // Get available missions for current category
+  const getAvailableMissions = () => {
+    return mockMissions[activeTab as keyof typeof mockMissions]
+      .filter(mission => !missionHasProgress(mission) && !mission.isCompleted);
+  };
+
+  // Get completed missions for current category
+  const getCompletedMissions = () => {
+    return mockMissions[activeTab as keyof typeof mockMissions]
+      .filter(mission => mission.isCompleted);
+  };
   
   return (
     <div className="space-y-6">
@@ -234,25 +257,20 @@ const MissionList: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-medium">Active Missions</h2>
               <Badge variant="outline" className="text-muted-foreground">
-                {mockMissions[activeTab as keyof typeof mockMissions]
-                  .filter(m => m.progress !== undefined && !m.isCompleted).length} Active
+                {getActiveMissions().length} Active
               </Badge>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockMissions[activeTab as keyof typeof mockMissions]
-                .filter(mission => mission.progress !== undefined && !mission.isCompleted)
-                .map(mission => (
-                  <MissionCard key={mission.id} mission={mission} />
-                ))}
+              {getActiveMissions().map(mission => (
+                <MissionCard key={mission.id} mission={mission} />
+              ))}
               
-              {mockMissions[activeTab as keyof typeof mockMissions]
-                .filter(mission => mission.progress !== undefined && !mission.isCompleted)
-                .length === 0 && (
-                  <div className="col-span-full text-center py-8 bg-muted rounded-lg">
-                    <p className="text-muted-foreground">No active missions. Start a new one!</p>
-                  </div>
-                )}
+              {getActiveMissions().length === 0 && (
+                <div className="col-span-full text-center py-8 bg-muted rounded-lg">
+                  <p className="text-muted-foreground">No active missions. Start a new one!</p>
+                </div>
+              )}
             </div>
           </div>
           
@@ -261,17 +279,14 @@ const MissionList: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-medium">Available Missions</h2>
               <Badge variant="outline" className="text-muted-foreground">
-                {mockMissions[activeTab as keyof typeof mockMissions]
-                  .filter(m => m.progress === undefined && !m.isCompleted).length} Available
+                {getAvailableMissions().length} Available
               </Badge>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockMissions[activeTab as keyof typeof mockMissions]
-                .filter(mission => mission.progress === undefined && !mission.isCompleted)
-                .map((mission) => (
-                  <MissionCard key={mission.id} mission={mission} />
-                ))}
+              {getAvailableMissions().map((mission) => (
+                <MissionCard key={mission.id} mission={mission} />
+              ))}
             </div>
           </div>
           
@@ -280,25 +295,20 @@ const MissionList: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-medium">Completed Missions</h2>
               <Badge variant="outline" className="bg-liferoot-green/10 text-liferoot-green border-liferoot-green">
-                {mockMissions[activeTab as keyof typeof mockMissions]
-                  .filter(m => m.isCompleted).length} Completed
+                {getCompletedMissions().length} Completed
               </Badge>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockMissions[activeTab as keyof typeof mockMissions]
-                .filter(mission => mission.isCompleted)
-                .map((mission) => (
-                  <MissionCard key={mission.id} mission={mission} />
-                ))}
+              {getCompletedMissions().map((mission) => (
+                <MissionCard key={mission.id} mission={mission} />
+              ))}
               
-              {mockMissions[activeTab as keyof typeof mockMissions]
-                .filter(mission => mission.isCompleted)
-                .length === 0 && (
-                  <div className="col-span-full text-center py-8 bg-muted rounded-lg">
-                    <p className="text-muted-foreground">No completed missions yet. Start your journey!</p>
-                  </div>
-                )}
+              {getCompletedMissions().length === 0 && (
+                <div className="col-span-full text-center py-8 bg-muted rounded-lg">
+                  <p className="text-muted-foreground">No completed missions yet. Start your journey!</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
