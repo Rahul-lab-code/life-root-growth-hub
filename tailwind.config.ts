@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        liferoot: {
+          'green-light': '#81C784',
+          'green': '#4CAF50',
+          'green-dark': '#2E7D32',
+          'blue-light': '#90CAF9',
+          'blue': '#42A5F5',
+          'blue-dark': '#1565C0',
+          'yellow-light': '#FFF59D',
+          'yellow': '#FFEE58',
+          'yellow-dark': '#F9A825',
+          'earth': '#A1887F',
+          'earth-light': '#D7CCC8',
+          'earth-dark': '#6D4C41',
+        }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +99,26 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'pulse-soft': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' },
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+			},
+      boxShadow: {
+        'soft': '0 10px 25px -5px rgba(0, 0, 0, 0.05)',
+        'hover': '0 20px 35px -10px rgba(0, 0, 0, 0.1)',
+      }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

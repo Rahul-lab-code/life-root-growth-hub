@@ -1,0 +1,225 @@
+
+# Backend Routes for LifeRoot Platform
+
+## Authentication Routes
+POST /api/auth/register       # Register a new user (admin only can create accounts)
+POST /api/auth/login          # Login for all roles
+POST /api/auth/logout         # Logout for all roles
+GET /api/auth/me              # Get current user's profile (protected route)
+PUT /api/auth/password/reset  # Reset password
+PUT /api/auth/profile/update  # Update user profile information
+
+## Admin Routes
+GET /api/admin/users                  # Get all users (admin only)
+POST /api/admin/users                 # Create a new user (admin only)
+PUT /api/admin/users/:id              # Update user details (admin only)
+DELETE /api/admin/users/:id           # Delete a user (admin only)
+POST /api/admin/assign-mentor         # Assign students to a mentor (admin only)
+GET /api/admin/stats                  # Get platform statistics (admin only)
+GET /api/admin/schools                # Get all schools info (admin only)
+POST /api/admin/schools               # Add a new school (admin only)
+GET /api/admin/missions               # Get all mission templates (admin only)
+POST /api/admin/missions              # Create a new mission template (admin only)
+PUT /api/admin/missions/:id           # Update a mission template (admin only)
+
+## Mentor Routes
+GET /api/mentor/profile               # Get mentor profile (mentor only)
+PUT /api/mentor/profile               # Update mentor profile (mentor only)
+GET /api/mentor/students              # Get students assigned to mentor (mentor only)
+GET /api/mentor/missions/:studentId   # Get a student's missions (mentor only)
+PUT /api/mentor/missions/:missionId   # Approve/reject mission submission (mentor only)
+POST /api/mentor/feedback/:studentId  # Provide feedback to a student (mentor only)
+GET /api/mentor/stats                 # Get stats for mentor's students (mentor only)
+
+## Student Routes
+GET /api/student/profile              # Get student profile (student only)
+PUT /api/student/profile              # Update student profile (student only)
+GET /api/student/missions             # Get student's missions (student only)
+GET /api/student/missions/:category   # Get missions by category (student only)
+POST /api/student/missions/:id/start  # Start a new mission (student only)
+POST /api/student/missions/:id/submit # Submit mission evidence (student only)
+GET /api/student/stats                # Get student's stats and progress (student only)
+GET /api/student/badges               # Get student's earned badges (student only)
+POST /api/student/journal             # Add a journal entry (student only)
+GET /api/student/journal              # Get all journal entries (student only)
+
+## Soul Circles (Community) Routes
+GET /api/circles                      # Get all public posts in soul circles
+POST /api/circles                     # Create a new post (authenticated users)
+GET /api/circles/mine                 # Get user's own posts
+PUT /api/circles/:id                  # Edit own post
+DELETE /api/circles/:id               # Delete own post
+POST /api/circles/:id/react           # React to a post (like/support)
+POST /api/circles/:id/comment         # Comment on a post
+GET /api/circles/:id/comments         # Get comments on a post
+
+## AI Mentor Routes
+POST /api/ai/mentor/chat              # Send message to AI mentor
+POST /api/ai/mentor/analyze-mood      # Analyze student's mood from text
+POST /api/ai/mentor/suggest-mission   # Get AI suggested missions based on profile/mood
+
+## Missions Routes
+GET /api/missions                     # Get all available missions
+GET /api/missions/:id                 # Get mission details
+GET /api/missions/categories          # Get all mission categories
+GET /api/missions/leaderboard         # Get mission leaderboard data
+
+## School Routes
+GET /api/schools                      # Get all schools
+GET /api/schools/:id                  # Get specific school details
+GET /api/schools/:id/leaderboard      # Get school's leaderboard data
+GET /api/schools/:id/stats            # Get school's sustainability stats
+
+## Data Models
+
+### User Model
+```javascript
+{
+  id: String,
+  name: String,
+  email: String,
+  password: String (hashed),
+  role: Enum ["admin", "mentor", "student"],
+  schoolId: ObjectId (ref: School),
+  profileImg: String (URL),
+  createdAt: Date,
+  updatedAt: Date,
+  
+  // Role-specific fields
+  // For Students:
+  gradeLevel: Number,
+  mentorId: ObjectId (ref: User),
+  badges: [ObjectId] (ref: Badge),
+  points: {
+    eco: Number,
+    eq: Number,
+    values: Number
+  },
+  
+  // For Mentors:
+  studentIds: [ObjectId] (ref: User),
+  specialization: String,
+  
+  // For All:
+  lastActive: Date
+}
+```
+
+### Mission Model
+```javascript
+{
+  id: String,
+  title: String,
+  description: String,
+  category: Enum ["eco", "eq", "values"],
+  difficulty: Enum ["easy", "medium", "hard"],
+  points: Number,
+  timeEstimate: String,
+  instructions: [String],
+  evidenceRequired: [String],
+  createdBy: ObjectId (ref: User),
+  createdAt: Date,
+  updatedAt: Date,
+  isTemplate: Boolean
+}
+```
+
+### MissionAssignment Model
+```javascript
+{
+  id: String,
+  missionId: ObjectId (ref: Mission),
+  studentId: ObjectId (ref: User),
+  mentorId: ObjectId (ref: User),
+  status: Enum ["assigned", "in-progress", "submitted", "approved", "rejected"],
+  startDate: Date,
+  dueDate: Date,
+  completedDate: Date,
+  evidence: [{
+    type: String,
+    content: String, // URL for images/videos or text content
+    submittedAt: Date
+  }],
+  feedback: {
+    mentorId: ObjectId (ref: User),
+    content: String,
+    createdAt: Date
+  },
+  pointsAwarded: Number,
+  reflection: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Badge Model
+```javascript
+{
+  id: String,
+  name: String,
+  description: String,
+  category: Enum ["eco", "eq", "values", "achievement"],
+  imageUrl: String,
+  criteria: String,
+  pointsRequired: Number,
+  createdAt: Date
+}
+```
+
+### JournalEntry Model
+```javascript
+{
+  id: String,
+  studentId: ObjectId (ref: User),
+  content: String,
+  mood: String,
+  moodAnalysis: Object, // AI-generated analysis
+  tags: [String],
+  isPrivate: Boolean,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### SoulCirclePost Model
+```javascript
+{
+  id: String,
+  authorId: ObjectId (ref: User),
+  content: String,
+  category: Enum ["eco", "eq", "values", "general"],
+  isAnonymous: Boolean,
+  reactions: [{
+    userId: ObjectId (ref: User),
+    type: String,
+    createdAt: Date
+  }],
+  commentCount: Number,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### School Model
+```javascript
+{
+  id: String,
+  name: String,
+  location: {
+    address: String,
+    city: String,
+    state: String,
+    country: String,
+    geo: {
+      lat: Number,
+      lng: Number
+    }
+  },
+  adminIds: [ObjectId] (ref: User),
+  studentCount: Number,
+  mentorCount: Number,
+  ecoRating: Number,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
