@@ -73,10 +73,9 @@ export const useLiferootAPI = () => {
     } catch (error) {
       // Show error toast unless disabled
       if (!disableToast) {
-        toast({
-          title: 'API Error',
+        toast("API Error", {
           description: error instanceof Error ? error.message : 'An unknown error occurred',
-          variant: 'destructive',
+          variant: "destructive",
         });
       }
       
@@ -119,10 +118,9 @@ export const useLiferootAPI = () => {
             setError(err instanceof Error ? err : new Error('An unknown error occurred'));
             
             if (!options.disableToast) {
-              toast({
-                title: 'Error fetching data',
+              toast("Error fetching data", {
                 description: err instanceof Error ? err.message : 'An unknown error occurred',
-                variant: 'destructive',
+                variant: "destructive",
               });
             }
           }
