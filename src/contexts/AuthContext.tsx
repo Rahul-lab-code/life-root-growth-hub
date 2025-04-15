@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -11,6 +10,10 @@ export interface User {
   name: string;
   role: UserRole;
   profileImg?: string;
+  bio?: string;
+  school?: string;
+  interests?: string[];
+  joined?: Date;
 }
 
 interface AuthContextType {
@@ -30,6 +33,10 @@ const MOCK_USERS = [
     name: "Admin User",
     role: "admin" as UserRole,
     profileImg: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+    bio: "Platform administrator managing all aspects of LifeRoot",
+    school: "LifeRoot Academy",
+    interests: ["Education", "Sustainability", "Technology"],
+    joined: new Date("2023-01-01"),
   },
   {
     id: "2",
@@ -38,6 +45,10 @@ const MOCK_USERS = [
     name: "Mentor Smith",
     role: "mentor" as UserRole,
     profileImg: "https://api.dicebear.com/7.x/avataaars/svg?seed=mentor",
+    bio: "Dedicated mentor helping students grow through sustainability education",
+    school: "Green Future Institute",
+    interests: ["Environmental Education", "Coaching", "Sustainable Living"],
+    joined: new Date("2023-02-15"),
   },
   {
     id: "3",
@@ -46,6 +57,10 @@ const MOCK_USERS = [
     name: "Alex Student",
     role: "student" as UserRole,
     profileImg: "https://api.dicebear.com/7.x/avataaars/svg?seed=student",
+    bio: "Passionate about learning how to live more sustainably",
+    school: "Eco High School",
+    interests: ["Gardening", "Recycling", "Mindfulness"],
+    joined: new Date("2023-03-10"),
   },
 ];
 
