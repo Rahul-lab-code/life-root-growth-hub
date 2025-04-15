@@ -1,260 +1,203 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, ChevronDown, Loader2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Brain, Heart, Leaf, MessageCircle, BookOpen } from "lucide-react";
+import MoodTracker from "@/components/student/MoodTracker";
+import MentorChat from "@/components/student/MentorChat";
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: Date;
-}
+type Mood = "great" | "okay" | "bad" | null;
 
 const AiMentor: React.FC = () => {
   const { currentUser } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Initial greeting message on component mount
-  useEffect(() => {
-    const initialMessage: Message = {
-      id: '1',
-      text: "Hi there! I'm Roo, your AI mentor. How are you feeling today?",
-      sender: 'ai',
-      timestamp: new Date(),
-    };
-    setMessages([initialMessage]);
-  }, []);
-
-  // Scroll to bottom when new messages come in
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Process AI response
-  const getAiResponse = async (userMessage: string) => {
-    setIsTyping(true);
+  const [selectedMood, setSelectedMood] = useState<Mood>(null);
+  
+  const handleMoodSelected = (mood: Mood) => {
+    setSelectedMood(mood);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    let response = '';
-    
-    // Simple rule-based responses for demo purposes
-    const lowercaseMessage = userMessage.toLowerCase();
-    
-    if (lowercaseMessage.includes('hello') || lowercaseMessage.includes('hi')) {
-      response = "Hello! It's great to chat with you. How are you doing today?";
-    } 
-    else if (lowercaseMessage.includes('how are you')) {
-      response = "I'm here to support you! What's on your mind today?";
-    }
-    else if (
-      lowercaseMessage.includes('sad') || 
-      lowercaseMessage.includes('depressed') || 
-      lowercaseMessage.includes('unhappy')
-    ) {
-      response = "I'm sorry to hear you're feeling down. Remember that it's okay to have these feelings. Would you like to talk about what's causing this feeling, or perhaps try a simple breathing exercise to help you feel better?";
-    }
-    else if (
-      lowercaseMessage.includes('happy') || 
-      lowercaseMessage.includes('great') || 
-      lowercaseMessage.includes('good')
-    ) {
-      response = "That's wonderful to hear! What's something positive that happened today that you'd like to share?";
-    }
-    else if (lowercaseMessage.includes('mission')) {
-      response = "Missions are a great way to grow! Would you like me to suggest a new mission based on your interests? I can recommend something in sustainability, emotional intelligence, or ethical values.";
-    }
-    else if (
-      lowercaseMessage.includes('advice') || 
-      lowercaseMessage.includes('help') ||
-      lowercaseMessage.includes('suggest')
-    ) {
-      response = "I'd be happy to help! Could you tell me more about what specific area you'd like advice on? Is it about school, relationships, sustainability, or something else?";
-    }
-    else {
-      response = "Thank you for sharing that with me. How does this make you feel? Remember that your emotions are valid, and I'm here to support your growth journey.";
-    }
-    
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      text: response,
-      sender: 'ai',
-      timestamp: new Date(),
-    };
-    
-    setIsTyping(false);
-    setMessages(prevMessages => [...prevMessages, newMessage]);
+    // TODO: Save mood to backend
+    // API endpoint: POST /api/student/mood
+    // Request body: { userId: currentUser.id, mood, timestamp: new Date() }
   };
-
-  const handleSendMessage = () => {
-    if (inputText.trim() === '') return;
-    
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-    
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    setInputText('');
-    
-    // Get AI response
-    getAiResponse(inputText);
-    
-    // Focus input after sending
-    inputRef.current?.focus();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
+  
+  const getMoodBasedMessage = () => {
+    switch(selectedMood) {
+      case "great":
+        return "That's wonderful to hear! Since you're feeling great, maybe this is a good time to take on a new challenge or help someone else who might be struggling?";
+      case "okay":
+        return "Thanks for sharing. It's perfectly fine to have average days. Is there anything specific you'd like to talk about to make today a bit better?";
+      case "bad":
+        return "I'm sorry to hear you're not feeling great. Would you like to talk about what's bothering you? Or perhaps try a quick mindfulness exercise to help you feel better?";
+      default:
+        return "Hi there! I'm Roo, your AI mentor. How can I support your growth journey today?";
     }
   };
 
-  // Format timestamp for messages
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  if (!currentUser) return null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-144px)]">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-liferoot-blue p-2 rounded-full">
-            <Avatar className="h-10 w-10 border-2 border-white">
-              <AvatarImage src="/placeholder.svg" alt="Roo" />
-              <AvatarFallback className="bg-liferoot-blue-light text-liferoot-blue-dark">Roo</AvatarFallback>
-            </Avatar>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Roo - Your AI Mentor</h1>
-            <p className="text-muted-foreground">Chat with Roo about anything on your mind</p>
-          </div>
-        </div>
-        <Badge variant="outline" className="bg-liferoot-blue/10 text-liferoot-blue border-liferoot-blue">
-          AI Powered
-        </Badge>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Meet Roo, Your AI Mentor</h1>
+        <p className="text-muted-foreground">
+          Your personal guide for sustainability, emotional growth, and ethical living
+        </p>
       </div>
 
-      {/* Chat container */}
-      <Card className="flex-1 flex flex-col overflow-hidden mb-4">
-        <CardContent className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.sender === 'user'
-                      ? 'bg-liferoot-green text-white rounded-br-none'
-                      : 'bg-muted rounded-bl-none'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{message.text}</p>
-                  <p
-                    className={`text-xs mt-1 ${
-                      message.sender === 'user' ? 'text-white/70' : 'text-muted-foreground'
-                    }`}
+      <MoodTracker onMoodSelected={handleMoodSelected} />
+      
+      <Tabs defaultValue="chat" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="chat" className="flex items-center gap-1">
+            <MessageCircle className="h-4 w-4" /> Chat with Roo
+          </TabsTrigger>
+          <TabsTrigger value="mind-gym" className="flex items-center gap-1">
+            <Brain className="h-4 w-4" /> Mind Gym
+          </TabsTrigger>
+          <TabsTrigger value="journal" className="flex items-center gap-1">
+            <BookOpen className="h-4 w-4" /> Journal
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="chat">
+          <MentorChat initialMessage={getMoodBasedMessage()} />
+        </TabsContent>
+        
+        <TabsContent value="mind-gym">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <div className="bg-liferoot-blue p-2 rounded-full w-fit mb-2">
+                  <Brain className="h-5 w-5 text-white" />
+                </div>
+                <CardTitle>Guided Meditation</CardTitle>
+                <CardDescription>
+                  Take a moment to center yourself with guided meditation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Choose a meditation length:
+                </p>
+                <div className="flex gap-2">
+                  {[5, 10, 15, 20].map(minutes => (
+                    <button
+                      key={minutes}
+                      className="bg-muted hover:bg-accent px-3 py-1 rounded text-sm flex-1"
+                      onClick={() => {
+                        // TODO: Connect to meditation API or content
+                        console.log(`Starting ${minutes}-minute meditation`);
+                      }}
+                    >
+                      {minutes} min
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <div className="bg-liferoot-green p-2 rounded-full w-fit mb-2">
+                  <Leaf className="h-5 w-5 text-white" />
+                </div>
+                <CardTitle>Breathing Exercise</CardTitle>
+                <CardDescription>
+                  Practice focused breathing to reduce stress
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Choose a technique:
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className="bg-muted hover:bg-accent px-3 py-2 rounded text-sm"
+                    onClick={() => {
+                      // TODO: Implement breathing exercise
+                      console.log("Starting box breathing");
+                    }}
                   >
-                    {formatTime(message.timestamp)}
-                  </p>
+                    Box Breathing
+                  </button>
+                  <button
+                    className="bg-muted hover:bg-accent px-3 py-2 rounded text-sm"
+                    onClick={() => {
+                      // TODO: Implement breathing exercise
+                      console.log("Starting 4-7-8 breathing");
+                    }}
+                  >
+                    4-7-8 Technique
+                  </button>
+                  <button
+                    className="bg-muted hover:bg-accent px-3 py-2 rounded text-sm"
+                    onClick={() => {
+                      // TODO: Implement breathing exercise
+                      console.log("Starting deep breathing");
+                    }}
+                  >
+                    Deep Breathing
+                  </button>
+                  <button
+                    className="bg-muted hover:bg-accent px-3 py-2 rounded text-sm"
+                    onClick={() => {
+                      // TODO: Implement breathing exercise
+                      console.log("Starting alternate nostril");
+                    }}
+                  >
+                    Alternate Nostril
+                  </button>
                 </div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg p-3 rounded-bl-none">
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full bg-liferoot-blue animate-pulse"></div>
-                    <div className="w-2 h-2 rounded-full bg-liferoot-blue animate-pulse delay-150"></div>
-                    <div className="w-2 h-2 rounded-full bg-liferoot-blue animate-pulse delay-300"></div>
-                  </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <div className="bg-liferoot-yellow p-2 rounded-full w-fit mb-2">
+                  <Heart className="h-5 w-5 text-white" />
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
+                <CardTitle>Today's Wellbeing Challenge</CardTitle>
+                <CardDescription>
+                  A daily activity to improve your emotional wellbeing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-base mb-4">
+                  Write down three things you're grateful for today. They can be big things or small moments that brought you joy.
+                </p>
+                <div className="bg-muted p-4 rounded-md text-sm italic">
+                  "Gratitude turns what we have into enough, and more. It turns denial into acceptance, chaos into order, confusion into clarity...it makes sense of our past, brings peace for today, and creates a vision for tomorrow."
+                  <p className="text-right mt-2">– Melody Beattie</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Input area */}
-      <div className="relative">
-        <Input
-          ref={inputRef}
-          type="text"
-          placeholder="Type your message here..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="pr-24 py-6"
-        />
-        <div className="absolute right-0 top-0 h-full flex items-center pr-3">
-          <Button
-            onClick={handleSendMessage}
-            disabled={inputText.trim() === '' || isTyping}
-            variant="ghost"
-            size="icon"
-            className="text-primary"
-          >
-            {isTyping ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Send className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Quick response buttons */}
-      <div className="flex flex-wrap gap-2 mt-3">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="rounded-full"
-          onClick={() => setInputText("I'm feeling stressed about school")}
-        >
-          I'm feeling stressed about school
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="rounded-full"
-          onClick={() => setInputText("Can you suggest an eco-mission?")}
-        >
-          Suggest an eco-mission
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="rounded-full"
-          onClick={() => setInputText("I need some motivation today")}
-        >
-          I need some motivation
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="rounded-full"
-          onClick={() => setInputText("How can I improve my emotional intelligence?")}
-        >
-          Improve my emotional intelligence
-        </Button>
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="journal">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reflection Journal</CardTitle>
+              <CardDescription>
+                Document your thoughts, feelings, and growth moments
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* TODO: Implement journal functionality with backend integration
+                  API endpoints:
+                  - GET /api/student/journal - Get all journal entries
+                  - POST /api/student/journal - Create new journal entry
+                  - PUT /api/student/journal/:id - Update journal entry
+                  - DELETE /api/student/journal/:id - Delete journal entry
+              */}
+              <p className="text-center text-muted-foreground py-12">
+                Journal feature coming soon...
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

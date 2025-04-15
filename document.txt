@@ -1,225 +1,330 @@
 
-# Backend Routes for LifeRoot Platform
+# LifeRoot Platform - Backend Integration Guide
 
-## Authentication Routes
-POST /api/auth/register       # Register a new user (admin only can create accounts)
-POST /api/auth/login          # Login for all roles
-POST /api/auth/logout         # Logout for all roles
-GET /api/auth/me              # Get current user's profile (protected route)
-PUT /api/auth/password/reset  # Reset password
-PUT /api/auth/profile/update  # Update user profile information
+## Authentication & User Management
 
-## Admin Routes
-GET /api/admin/users                  # Get all users (admin only)
-POST /api/admin/users                 # Create a new user (admin only)
-PUT /api/admin/users/:id              # Update user details (admin only)
-DELETE /api/admin/users/:id           # Delete a user (admin only)
-POST /api/admin/assign-mentor         # Assign students to a mentor (admin only)
-GET /api/admin/stats                  # Get platform statistics (admin only)
-GET /api/admin/schools                # Get all schools info (admin only)
-POST /api/admin/schools               # Add a new school (admin only)
-GET /api/admin/missions               # Get all mission templates (admin only)
-POST /api/admin/missions              # Create a new mission template (admin only)
-PUT /api/admin/missions/:id           # Update a mission template (admin only)
+### Auth Routes
+- `POST /api/auth/login` - User login
+  - Request: { email: string, password: string }
+  - Response: { user: UserObject, token: string }
 
-## Mentor Routes
-GET /api/mentor/profile               # Get mentor profile (mentor only)
-PUT /api/mentor/profile               # Update mentor profile (mentor only)
-GET /api/mentor/students              # Get students assigned to mentor (mentor only)
-GET /api/mentor/missions/:studentId   # Get a student's missions (mentor only)
-PUT /api/mentor/missions/:missionId   # Approve/reject mission submission (mentor only)
-POST /api/mentor/feedback/:studentId  # Provide feedback to a student (mentor only)
-GET /api/mentor/stats                 # Get stats for mentor's students (mentor only)
+- `POST /api/auth/logout` - User logout
+  - Request: No body, auth token in header
+  - Response: { success: boolean, message: string }
 
-## Student Routes
-GET /api/student/profile              # Get student profile (student only)
-PUT /api/student/profile              # Update student profile (student only)
-GET /api/student/missions             # Get student's missions (student only)
-GET /api/student/missions/:category   # Get missions by category (student only)
-POST /api/student/missions/:id/start  # Start a new mission (student only)
-POST /api/student/missions/:id/submit # Submit mission evidence (student only)
-GET /api/student/stats                # Get student's stats and progress (student only)
-GET /api/student/badges               # Get student's earned badges (student only)
-POST /api/student/journal             # Add a journal entry (student only)
-GET /api/student/journal              # Get all journal entries (student only)
+- `GET /api/auth/me` - Get current authenticated user
+  - Request: No body, auth token in header
+  - Response: { user: UserObject }
 
-## Soul Circles (Community) Routes
-GET /api/circles                      # Get all public posts in soul circles
-POST /api/circles                     # Create a new post (authenticated users)
-GET /api/circles/mine                 # Get user's own posts
-PUT /api/circles/:id                  # Edit own post
-DELETE /api/circles/:id               # Delete own post
-POST /api/circles/:id/react           # React to a post (like/support)
-POST /api/circles/:id/comment         # Comment on a post
-GET /api/circles/:id/comments         # Get comments on a post
+### User Management Routes
+- `GET /api/users` - Admin only: List all users
+  - Optional query params: role, page, limit
+  - Response: { users: UserObject[], total: number, page: number, pageSize: number }
 
-## AI Mentor Routes
-POST /api/ai/mentor/chat              # Send message to AI mentor
-POST /api/ai/mentor/analyze-mood      # Analyze student's mood from text
-POST /api/ai/mentor/suggest-mission   # Get AI suggested missions based on profile/mood
+- `POST /api/users` - Admin only: Create new user
+  - Request: { name: string, email: string, password: string, role: string, school?: string }
+  - Response: { user: UserObject }
 
-## Missions Routes
-GET /api/missions                     # Get all available missions
-GET /api/missions/:id                 # Get mission details
-GET /api/missions/categories          # Get all mission categories
-GET /api/missions/leaderboard         # Get mission leaderboard data
+- `GET /api/users/:userId` - Get user details
+  - Response: { user: UserObject }
 
-## School Routes
-GET /api/schools                      # Get all schools
-GET /api/schools/:id                  # Get specific school details
-GET /api/schools/:id/leaderboard      # Get school's leaderboard data
-GET /api/schools/:id/stats            # Get school's sustainability stats
+- `PUT /api/users/:userId` - Update user details
+  - Request: { name?: string, email?: string, profileImg?: string, bio?: string, school?: string }
+  - Response: { user: UserObject }
+
+- `DELETE /api/users/:userId` - Admin only: Delete user
+  - Response: { success: boolean, message: string }
+
+## Student Features
+
+### Mission Routes
+- `GET /api/missions` - List available missions
+  - Optional query params: category, difficulty, status, page, limit
+  - Response: { missions: MissionObject[], total: number }
+
+- `GET /api/missions/:missionId` - Get mission details
+  - Response: { mission: MissionObject }
+
+- `GET /api/student/missions` - Get student's assigned/active missions
+  - Response: { active: MissionObject[], completed: MissionObject[] }
+
+- `POST /api/student/missions/:missionId/start` - Start a mission
+  - Response: { success: boolean, studentMission: StudentMissionObject }
+
+- `PUT /api/student/missions/:missionId/progress` - Update mission progress
+  - Request: { progress: number, notes?: string }
+  - Response: { success: boolean, studentMission: StudentMissionObject }
+
+- `POST /api/student/missions/:missionId/complete` - Submit mission for approval
+  - Request: { reflection: string, evidence: string[] }
+  - Response: { success: boolean, studentMission: StudentMissionObject }
+
+### Evidence Upload
+- `POST /api/upload/evidence` - Upload mission evidence
+  - Request: FormData with file
+  - Response: { fileUrl: string, fileType: string }
+
+### AI Mentor Routes
+- `POST /api/mentor/chat` - Send message to AI mentor
+  - Request: { message: string }
+  - Response: { reply: string }
+
+- `POST /api/student/mood` - Record student mood
+  - Request: { mood: string, timestamp: Date }
+  - Response: { success: boolean }
+
+### Journal Routes
+- `GET /api/student/journal` - Get student journal entries
+  - Optional query params: startDate, endDate, page, limit
+  - Response: { entries: JournalEntryObject[], total: number }
+
+- `POST /api/student/journal` - Create journal entry
+  - Request: { content: string, mood?: string, tags?: string[] }
+  - Response: { entry: JournalEntryObject }
+
+- `PUT /api/student/journal/:entryId` - Update journal entry
+  - Request: { content?: string, mood?: string, tags?: string[] }
+  - Response: { entry: JournalEntryObject }
+
+- `DELETE /api/student/journal/:entryId` - Delete journal entry
+  - Response: { success: boolean }
+
+### Statistics & Progress Routes
+- `GET /api/student/stats` - Get student statistics
+  - Response: { totalPoints: number, ecoPoints: number, eqPoints: number, valuePoints: number, streak: number, badges: BadgeObject[] }
+
+- `GET /api/student/badges` - Get student badges
+  - Response: { badges: BadgeObject[] }
+
+- `GET /api/student/achievements` - Get student achievements
+  - Response: { achievements: AchievementObject[] }
+
+## Mentor Features
+
+### Student Management Routes
+- `GET /api/mentor/students` - Get mentor's assigned students
+  - Response: { students: StudentObject[] }
+
+- `GET /api/mentor/students/:studentId` - Get student details
+  - Response: { student: StudentObject, stats: StatsObject }
+
+### Mission Approval Routes
+- `GET /api/mentor/approvals` - Get pending mission approvals
+  - Response: { pendingApprovals: MissionApprovalObject[] }
+
+- `PUT /api/mentor/missions/:missionId/approve` - Approve student mission
+  - Request: { feedback?: string, rating?: number }
+  - Response: { success: boolean, message: string }
+
+- `PUT /api/mentor/missions/:missionId/reject` - Reject student mission
+  - Request: { feedback: string }
+  - Response: { success: boolean, message: string }
+
+## Admin Features
+
+### School Management Routes
+- `GET /api/admin/schools` - List all schools
+  - Response: { schools: SchoolObject[] }
+
+- `POST /api/admin/schools` - Create new school
+  - Request: { name: string, location: string, contactEmail: string }
+  - Response: { school: SchoolObject }
+
+- `PUT /api/admin/schools/:schoolId` - Update school
+  - Request: { name?: string, location?: string, contactEmail?: string }
+  - Response: { school: SchoolObject }
+
+### Mission Management Routes
+- `POST /api/admin/missions` - Create new mission
+  - Request: MissionCreateRequest
+  - Response: { mission: MissionObject }
+
+- `PUT /api/admin/missions/:missionId` - Update mission
+  - Request: MissionUpdateRequest
+  - Response: { mission: MissionObject }
+
+- `DELETE /api/admin/missions/:missionId` - Delete mission
+  - Response: { success: boolean, message: string }
+
+### Statistics & Analytics Routes
+- `GET /api/admin/stats` - Get platform statistics
+  - Response: { totalUsers: number, totalStudents: number, totalMentors: number, totalSchools: number, totalCompletedMissions: number, newUsersThisMonth: number }
+
+- `GET /api/admin/analytics/users` - Get user growth analytics
+  - Optional query params: startDate, endDate, groupBy (day, week, month)
+  - Response: { data: AnalyticsDataPoint[] }
+
+- `GET /api/admin/analytics/missions` - Get mission completion analytics
+  - Optional query params: startDate, endDate, groupBy (day, week, month)
+  - Response: { data: AnalyticsDataPoint[] }
 
 ## Data Models
 
-### User Model
+### User
 ```javascript
 {
-  id: String,
-  name: String,
-  email: String,
-  password: String (hashed),
-  role: Enum ["admin", "mentor", "student"],
-  schoolId: ObjectId (ref: School),
-  profileImg: String (URL),
-  createdAt: Date,
-  updatedAt: Date,
-  
-  // Role-specific fields
-  // For Students:
-  gradeLevel: Number,
-  mentorId: ObjectId (ref: User),
-  badges: [ObjectId] (ref: Badge),
-  points: {
-    eco: Number,
-    eq: Number,
-    values: Number
-  },
-  
-  // For Mentors:
-  studentIds: [ObjectId] (ref: User),
-  specialization: String,
-  
-  // For All:
-  lastActive: Date
-}
-```
-
-### Mission Model
-```javascript
-{
-  id: String,
-  title: String,
-  description: String,
-  category: Enum ["eco", "eq", "values"],
-  difficulty: Enum ["easy", "medium", "hard"],
-  points: Number,
-  timeEstimate: String,
-  instructions: [String],
-  evidenceRequired: [String],
-  createdBy: ObjectId (ref: User),
-  createdAt: Date,
-  updatedAt: Date,
-  isTemplate: Boolean
-}
-```
-
-### MissionAssignment Model
-```javascript
-{
-  id: String,
-  missionId: ObjectId (ref: Mission),
-  studentId: ObjectId (ref: User),
-  mentorId: ObjectId (ref: User),
-  status: Enum ["assigned", "in-progress", "submitted", "approved", "rejected"],
-  startDate: Date,
-  dueDate: Date,
-  completedDate: Date,
-  evidence: [{
-    type: String,
-    content: String, // URL for images/videos or text content
-    submittedAt: Date
-  }],
-  feedback: {
-    mentorId: ObjectId (ref: User),
-    content: String,
-    createdAt: Date
-  },
-  pointsAwarded: Number,
-  reflection: String,
+  id: string,
+  name: string,
+  email: string,
+  passwordHash: string,
+  role: "admin" | "mentor" | "student",
+  profileImg?: string,
+  bio?: string,
+  school?: string,
+  interests?: string[],
   createdAt: Date,
   updatedAt: Date
 }
 ```
 
-### Badge Model
+### School
 ```javascript
 {
-  id: String,
-  name: String,
-  description: String,
-  category: Enum ["eco", "eq", "values", "achievement"],
-  imageUrl: String,
-  criteria: String,
-  pointsRequired: Number,
+  id: string,
+  name: string,
+  location: string,
+  contactEmail: string,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Mission
+```javascript
+{
+  id: string,
+  title: string,
+  description: string,
+  category: "eco" | "eq" | "values",
+  difficulty: "easy" | "medium" | "hard",
+  timeEstimate: string,
+  points: number,
+  steps: [
+    {
+      id: string,
+      title: string,
+      description: string
+    }
+  ],
+  reflection: {
+    question: string,
+    hint?: string
+  },
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### StudentMission
+```javascript
+{
+  id: string,
+  studentId: string,
+  missionId: string,
+  status: "assigned" | "in_progress" | "submitted" | "approved" | "rejected",
+  progress: number,
+  startDate: Date,
+  endDate?: Date,
+  reflection?: string,
+  evidence?: string[],
+  feedback?: string,
+  mentorId?: string,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### JournalEntry
+```javascript
+{
+  id: string,
+  studentId: string,
+  content: string,
+  mood?: string,
+  tags?: string[],
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Badge
+```javascript
+{
+  id: string,
+  name: string,
+  description: string,
+  category: "eco" | "eq" | "values" | "general",
+  criteria: string,
+  imageUrl: string,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### StudentBadge
+```javascript
+{
+  id: string,
+  studentId: string,
+  badgeId: string,
+  earnedDate: Date,
   createdAt: Date
 }
 ```
 
-### JournalEntry Model
+### Achievement
 ```javascript
 {
-  id: String,
-  studentId: ObjectId (ref: User),
-  content: String,
-  mood: String,
-  moodAnalysis: Object, // AI-generated analysis
-  tags: [String],
-  isPrivate: Boolean,
-  createdAt: Date,
-  updatedAt: Date
+  id: string,
+  studentId: string,
+  title: string,
+  description?: string,
+  points: number,
+  date: Date,
+  createdAt: Date
 }
 ```
 
-### SoulCirclePost Model
+### MoodLog
 ```javascript
 {
-  id: String,
-  authorId: ObjectId (ref: User),
-  content: String,
-  category: Enum ["eco", "eq", "values", "general"],
-  isAnonymous: Boolean,
-  reactions: [{
-    userId: ObjectId (ref: User),
-    type: String,
-    createdAt: Date
-  }],
-  commentCount: Number,
-  createdAt: Date,
-  updatedAt: Date
+  id: string,
+  studentId: string,
+  mood: "great" | "okay" | "bad",
+  timestamp: Date,
+  createdAt: Date
 }
 ```
 
-### School Model
-```javascript
-{
-  id: String,
-  name: String,
-  location: {
-    address: String,
-    city: String,
-    state: String,
-    country: String,
-    geo: {
-      lat: Number,
-      lng: Number
-    }
-  },
-  adminIds: [ObjectId] (ref: User),
-  studentCount: Number,
-  mentorCount: Number,
-  ecoRating: Number,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+## Implementation Tips
+
+### Database Setup
+1. Use MongoDB for document-based storage, well-suited for the flexible structure of user data and missions
+2. Create indexes on frequently queried fields (userId, missionId, etc.)
+3. Use MongoDB aggregation for statistics and analytics
+
+### Authentication
+1. Implement JWT (JSON Web Token) authentication
+2. Store tokens in HttpOnly cookies for security
+3. Include CSRF protection for production
+
+### File Storage
+1. Use a cloud storage service like AWS S3 or Cloudinary for storing mission evidence
+2. Generate secure, signed URLs for file uploads and downloads
+3. Implement file type validation and size limits
+
+### API Security
+1. Implement role-based access control (RBAC) for all endpoints
+2. Validate all incoming data using a schema validation library like Joi
+3. Rate limit sensitive endpoints to prevent abuse
+
+### AI Integration
+1. Use OpenAI's GPT API for the AI mentor functionality
+2. Store conversation history to maintain context between interactions
+3. Implement sentiment analysis for student responses to enhance the AI's emotional intelligence
+
+### Deployment Considerations
+1. Set up separate environments for development, staging, and production
+2. Use environment variables for configuration
+3. Implement comprehensive logging for debugging and monitoring
+4. Set up health check endpoints for monitoring service status
