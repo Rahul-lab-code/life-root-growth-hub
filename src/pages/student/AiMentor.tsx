@@ -3,15 +3,40 @@ import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Heart, Leaf, MessageCircle, BookOpen } from "lucide-react";
+import { Brain, Heart, Leaf, MessageCircle, BookOpen, PlusCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import MoodTracker from "@/components/student/MoodTracker";
 import MentorChat from "@/components/student/MentorChat";
+import JournalEntry, { JournalEntryData } from "@/components/student/JournalEntry";
 
 type Mood = "great" | "okay" | "bad" | null;
+
+// Mock journal entries
+const mockJournalEntries: JournalEntryData[] = [
+  {
+    id: "1",
+    title: "First day of eco challenge",
+    content: "Today I started tracking my food waste as part of the Reduce Food Waste mission. I was surprised at how much food I throw away without thinking about it. Going to be more mindful tomorrow.",
+    date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+    mood: "motivated",
+    tags: ["eco", "food waste"]
+  },
+  {
+    id: "2",
+    title: "Feeling stressed",
+    content: "Had a tough day at school today. Tried the breathing exercises that Roo suggested, which helped a little. Still feeling overwhelmed with all the assignments due next week.",
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+    mood: "stressed",
+    tags: ["school", "eq"]
+  }
+];
 
 const AiMentor: React.FC = () => {
   const { currentUser } = useAuth();
   const [selectedMood, setSelectedMood] = useState<Mood>(null);
+  const [journalEntries, setJournalEntries] = useState<JournalEntryData[]>(mockJournalEntries);
+  const [showNewJournalEntry, setShowNewJournalEntry] = useState(false);
+  const [currentJournalEntryId, setCurrentJournalEntryId] = useState<string | null>(null);
   
   const handleMoodSelected = (mood: Mood) => {
     setSelectedMood(mood);
@@ -32,6 +57,55 @@ const AiMentor: React.FC = () => {
       default:
         return "Hi there! I'm Roo, your AI mentor. How can I support your growth journey today?";
     }
+  };
+
+  const handleSaveJournalEntry = async (entry: JournalEntryData) => {
+    try {
+      // This is where we would make the API call to save the journal entry
+      // API endpoint: POST /api/student/journal
+      // or: PUT /api/student/journal/:id (if editing)
+      // Request body: entry
+      
+      if (entry.id) {
+        // Editing existing entry
+        setJournalEntries(prev => 
+          prev.map(item => item.id === entry.id ? entry : item)
+        );
+      } else {
+        // Creating new entry
+        const newEntry = {
+          ...entry,
+          id: `temp-${Date.now()}`, // In reality, this would come from the backend
+        };
+        setJournalEntries(prev => [newEntry, ...prev]);
+      }
+      
+      setShowNewJournalEntry(false);
+      setCurrentJournalEntryId(null);
+      
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error saving journal entry:", error);
+      return Promise.reject(error);
+    }
+  };
+
+  const handleDeleteJournalEntry = async (id: string) => {
+    try {
+      // This is where we would make the API call to delete the journal entry
+      // API endpoint: DELETE /api/student/journal/:id
+      
+      setJournalEntries(prev => prev.filter(entry => entry.id !== id));
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error deleting journal entry:", error);
+      return Promise.reject(error);
+    }
+  };
+
+  const handleEditEntry = (id: string) => {
+    setCurrentJournalEntryId(id);
+    setShowNewJournalEntry(true);
   };
 
   if (!currentUser) return null;
@@ -176,26 +250,71 @@ const AiMentor: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="journal">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reflection Journal</CardTitle>
-              <CardDescription>
-                Document your thoughts, feelings, and growth moments
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* TODO: Implement journal functionality with backend integration
-                  API endpoints:
-                  - GET /api/student/journal - Get all journal entries
-                  - POST /api/student/journal - Create new journal entry
-                  - PUT /api/student/journal/:id - Update journal entry
-                  - DELETE /api/student/journal/:id - Delete journal entry
-              */}
-              <p className="text-center text-muted-foreground py-12">
-                Journal feature coming soon...
-              </p>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Reflection Journal</h2>
+              <Button 
+                onClick={() => {
+                  setCurrentJournalEntryId(null);
+                  setShowNewJournalEntry(!showNewJournalEntry);
+                }}
+              >
+                {showNewJournalEntry ? "Cancel" : (
+                  <>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    New Entry
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {showNewJournalEntry ? (
+              <JournalEntry 
+                initialData={
+                  currentJournalEntryId 
+                    ? journalEntries.find(entry => entry.id === currentJournalEntryId) 
+                    : undefined
+                }
+                onSave={handleSaveJournalEntry}
+                onDelete={handleDeleteJournalEntry}
+              />
+            ) : (
+              journalEntries.length > 0 ? (
+                <div className="space-y-4">
+                  {journalEntries.map(entry => (
+                    <Card key={entry.id} className="hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => handleEditEntry(entry.id as string)}>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-lg">{entry.title}</CardTitle>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(entry.date).toLocaleDateString()}
+                          </div>
+                        </div>
+                        {entry.mood && (
+                          <div className="text-sm text-muted-foreground">
+                            Mood: {entry.mood}
+                          </div>
+                        )}
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm line-clamp-3">
+                          {entry.content}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-muted/50 rounded-lg">
+                  <p className="text-muted-foreground mb-4">No journal entries yet.</p>
+                  <Button onClick={() => setShowNewJournalEntry(true)}>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Create Your First Entry
+                  </Button>
+                </div>
+              )
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

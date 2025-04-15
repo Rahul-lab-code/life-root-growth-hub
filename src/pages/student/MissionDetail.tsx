@@ -3,7 +3,9 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import MissionDetails from "@/components/mission/MissionDetails";
+import MissionSubmission from "@/components/mission/MissionSubmission";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock data for a single mission
 const getMockMission = (id: string, category: string) => {
@@ -61,6 +63,7 @@ const MissionDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useAuth();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("details");
   
   useEffect(() => {
     if (!missionId || !category) return;
@@ -80,6 +83,39 @@ const MissionDetail: React.FC = () => {
     
     fetchMission();
   }, [missionId, category]);
+
+  const handleSubmitMission = async (data: { reflection: string, evidence: File[] }) => {
+    try {
+      // This would be the real API call
+      // API endpoint: POST /api/missions/{missionId}/submit
+      // Request body: { reflection: data.reflection, evidence: data.evidence }
+      console.log("Submitting mission:", { missionId, ...data });
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Mission submitted successfully!",
+        description: "Your mentor will review your submission soon.",
+      });
+      
+      // Update mission progress
+      setMission(prev => ({
+        ...prev,
+        progress: 100,
+        steps: prev.steps.map((step: any) => ({ ...step, isCompleted: true })),
+      }));
+      
+      setActiveTab("details");
+    } catch (error) {
+      console.error("Error submitting mission:", error);
+      toast({
+        title: "Submission failed",
+        description: "There was an error submitting your mission. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
   
   if (!currentUser) return null;
   
@@ -100,7 +136,29 @@ const MissionDetail: React.FC = () => {
     );
   }
   
-  return <MissionDetails mission={mission} />;
+  return (
+    <div className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="details">Mission Details</TabsTrigger>
+          <TabsTrigger value="submit">Submit Mission</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="details">
+          <MissionDetails mission={mission} />
+        </TabsContent>
+        
+        <TabsContent value="submit">
+          <MissionSubmission 
+            missionId={mission.id}
+            reflectionQuestion={mission.reflection.question}
+            reflectionHint={mission.reflection.hint}
+            onSubmit={handleSubmitMission}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 };
 
 export default MissionDetail;
