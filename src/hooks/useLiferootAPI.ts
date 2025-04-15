@@ -1,4 +1,5 @@
 
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/sonner";
@@ -75,7 +76,7 @@ export const useLiferootAPI = () => {
       if (!disableToast) {
         toast("API Error", {
           description: error instanceof Error ? error.message : 'An unknown error occurred',
-          variant: "destructive",
+          // Remove variant property as it's not supported
         });
       }
       
@@ -120,7 +121,7 @@ export const useLiferootAPI = () => {
             if (!options.disableToast) {
               toast("Error fetching data", {
                 description: err instanceof Error ? err.message : 'An unknown error occurred',
-                variant: "destructive",
+                // Remove variant property as it's not supported
               });
             }
           }
@@ -158,3 +159,4 @@ export const useLiferootAPI = () => {
     useFetch,
   };
 };
+
