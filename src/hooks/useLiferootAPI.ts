@@ -1,5 +1,4 @@
 
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/sonner";
@@ -159,4 +158,3 @@ export const useLiferootAPI = () => {
     useFetch,
   };
 };
-

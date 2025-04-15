@@ -12,9 +12,16 @@ import MainLayout from "./components/layout/MainLayout";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminUsers from "./pages/admin/Users";
+import AdminReports from "./pages/admin/Reports";
+import AdminSettings from "./pages/admin/Settings";
 
 // Mentor pages
 import MentorDashboard from "./pages/mentor/Dashboard";
+import MentorStudents from "./pages/mentor/Students";
+import MentorMessages from "./pages/mentor/Messages";
+import MentorMissions from "./pages/mentor/Missions";
+import MentorProfile from "./pages/mentor/Profile";
 
 // Student pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -68,7 +75,7 @@ const AppRoutes = () => {
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
 
       {/* If authenticated, redirect to role-specific dashboard */}
-      <Route path="/" element={isAuthenticated ? <AuthRedirect /> : <Navigate to="/login" replace />} />
+      <Route path="/" element={<Index />} />
 
       {/* Admin routes */}
       <Route path="/admin" element={
@@ -77,7 +84,11 @@ const AppRoutes = () => {
         </ProtectedRoute>
       }>
         <Route path="dashboard" element={<AdminDashboard />} />
-        {/* Add other admin routes as needed */}
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="users/new" element={<AdminUsers />} />
+        <Route path="reports" element={<AdminReports />} />
+        <Route path="settings" element={<AdminSettings />} />
+        <Route path="missions" element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
 
       {/* Mentor routes */}
@@ -87,7 +98,15 @@ const AppRoutes = () => {
         </ProtectedRoute>
       }>
         <Route path="dashboard" element={<MentorDashboard />} />
-        {/* Add other mentor routes as needed */}
+        <Route path="students" element={<MentorStudents />} />
+        <Route path="student/:studentId" element={<MentorStudents />} />
+        <Route path="messages" element={<MentorMessages />} />
+        <Route path="messages/:userId" element={<MentorMessages />} />
+        <Route path="missions" element={<MentorMissions />} />
+        <Route path="missions/new" element={<MentorMissions />} />
+        <Route path="missions/:missionId" element={<MentorMissions />} />
+        <Route path="missions/:missionId/edit" element={<MentorMissions />} />
+        <Route path="profile" element={<MentorProfile />} />
       </Route>
 
       {/* Student routes */}
@@ -102,7 +121,6 @@ const AppRoutes = () => {
         <Route path="mentor" element={<AiMentor />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="soul-circles" element={<SoulCircles />} />
-        {/* Add other student routes as needed */}
       </Route>
 
       {/* Catch-all route */}
