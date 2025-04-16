@@ -246,7 +246,7 @@ const PrakritiQuestionnaire: React.FC = () => {
     if (counts.vata > counts.pitta && counts.vata > counts.kapha) {
       return {
         type: 'vata',
-        description: 'You have a Vata-dominant constitution. You're creative, quick to learn, and adaptable, though you may struggle with consistency.',
+        description: 'You have a Vata-dominant constitution. You are creative, quick to learn, and adaptable, though you may struggle with consistency.',
         recommendations: [
           'Establish regular study routines',
           'Use creative methods like mind maps and storytelling',
@@ -262,7 +262,7 @@ const PrakritiQuestionnaire: React.FC = () => {
     if (counts.pitta > counts.vata && counts.pitta > counts.kapha) {
       return {
         type: 'pitta',
-        description: 'You have a Pitta-dominant constitution. You're focused, determined, and analytical, with a natural drive to achieve.',
+        description: 'You have a Pitta-dominant constitution. You are focused, determined, and analytical, with a natural drive to achieve.',
         recommendations: [
           'Set clear goals and track progress',
           'Engage in debates and analytical discussions',
@@ -277,7 +277,7 @@ const PrakritiQuestionnaire: React.FC = () => {
     
     return {
       type: 'kapha',
-      description: 'You have a Kapha-dominant constitution. You're steady, patient, and have excellent memory retention once you've mastered a concept.',
+      description: 'You have a Kapha-dominant constitution. You are steady, patient, and have excellent memory retention once you have mastered a concept.',
       recommendations: [
         'Use interactive and engaging study methods',
         'Incorporate physical movement into learning',
