@@ -33,6 +33,7 @@ import MissionDetail from "./pages/student/MissionDetail";
 import AiMentor from "./pages/student/AiMentor";
 import StudentProfile from "./pages/student/Profile";
 import SoulCircles from "./pages/student/SoulCircles";
+import PrakritiQuestionnaire from "./pages/student/PrakritiQuestionnaire";
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,7 @@ const AppRoutes = () => {
         <Route path="mentor" element={<AiMentor />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="soul-circles" element={<SoulCircles />} />
+        <Route path="prakriti-assessment" element={<PrakritiQuestionnaire />} />
       </Route>
 
       {/* Catch-all route */}

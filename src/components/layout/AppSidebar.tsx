@@ -25,7 +25,8 @@ import {
   LogOut, 
   Leaf, 
   Brain, 
-  Heart 
+  Heart,
+  Smile 
 } from 'lucide-react';
 import AppLogo from './AppLogo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -65,6 +66,7 @@ const AppSidebar: React.FC = () => {
           { icon: Leaf, title: 'Eco Missions', path: '/student/missions/eco' },
           { icon: Brain, title: 'EQ Missions', path: '/student/missions/eq' },
           { icon: Heart, title: 'Value Missions', path: '/student/missions/values' },
+          { icon: Smile, title: 'Prakriti Assessment', path: '/student/prakriti-assessment' },
           { icon: MessageSquare, title: 'Soul Circles', path: '/student/soul-circles' },
           { icon: User, title: 'My Profile', path: '/student/profile' }
         ];

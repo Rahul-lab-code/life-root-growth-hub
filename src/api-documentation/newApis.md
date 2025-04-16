@@ -1,85 +1,129 @@
+# New API Requirements for LifeRoot Application
 
-# LifeRoot New API Requirements
+## Student Prakriti Assessment
 
-## Missions APIs
+### GET /api/student/prakriti-assessment
 
-### Get All Missions
-- **Endpoint:** `GET /api/mentor/missions`
-- **Description:** Get all missions for mentor
-- **Query Parameters:**
-  - `type`: Filter by mission type (eco, eq, values)
-  - `status`: Filter by status (active, completed)
-  - `page`: Pagination page number
-  - `limit`: Results per page
-- **Response:** Array of mission objects
+Retrieves the student's Prakriti assessment results.
 
-### Create Mission
-- **Endpoint:** `POST /api/mentor/missions`
-- **Description:** Create a new mission
-- **Request Body:**
-  ```json
-  {
-    "title": "string",
+**Response**
+```json
+{
+  "id": "string",
+  "studentId": "string",
+  "createdAt": "string (ISO date)",
+  "updatedAt": "string (ISO date)",
+  "answers": {
+    "1": "vata|pitta|kapha",
+    "2": "vata|pitta|kapha",
+    // ... other question answers
+  },
+  "result": {
+    "type": "vata|pitta|kapha|vata-pitta|pitta-kapha|vata-kapha|balanced",
     "description": "string",
-    "type": "eco | eq | values",
-    "objectives": "string",
-    "timeEstimate": "string",
-    "points": "number",
-    "difficulty": "easy | medium | hard"
+    "recommendations": ["string", "string", ...]
   }
-  ```
+}
+```
 
-### Get Mission Details
-- **Endpoint:** `GET /api/mentor/missions/:missionId`
-- **Description:** Get details of a specific mission
-- **Response:** Mission object with full details
+### POST /api/student/prakriti-assessment
 
-### Update Mission
-- **Endpoint:** `PUT /api/mentor/missions/:missionId`
-- **Description:** Update an existing mission
-- **Request Body:** Same as create mission
+Saves a new Prakriti assessment result for the student.
 
-### Delete Mission
-- **Endpoint:** `DELETE /api/mentor/missions/:missionId`
-- **Description:** Delete a mission
+**Request Body**
+```json
+{
+  "answers": {
+    "1": "vata|pitta|kapha",
+    "2": "vata|pitta|kapha",
+    // ... other question answers
+  }
+}
+```
 
-### Get Mission Statistics
-- **Endpoint:** `GET /api/mentor/missions/stats`
-- **Description:** Get statistics about missions
-- **Response:**
-  ```json
+**Response**
+```json
+{
+  "id": "string",
+  "studentId": "string",
+  "createdAt": "string (ISO date)",
+  "updatedAt": "string (ISO date)",
+  "answers": {
+    "1": "vata|pitta|kapha",
+    "2": "vata|pitta|kapha",
+    // ... other question answers
+  },
+  "result": {
+    "type": "vata|pitta|kapha|vata-pitta|pitta-kapha|vata-kapha|balanced",
+    "description": "string",
+    "recommendations": ["string", "string", ...]
+  }
+}
+```
+
+### GET /api/student/prakriti-assessment/history
+
+Retrieves the history of student's Prakriti assessments.
+
+**Response**
+```json
+[
   {
-    "totalMissions": "number",
-    "activeMissions": "number",
-    "completedMissions": "number",
-    "studentProgress": [
-      {
-        "missionId": "string",
-        "studentsStarted": "number",
-        "studentsCompleted": "number"
-      }
-    ]
+    "id": "string",
+    "studentId": "string",
+    "createdAt": "string (ISO date)",
+    "result": {
+      "type": "vata|pitta|kapha|vata-pitta|pitta-kapha|vata-kapha|balanced"
+    }
+  },
+  // ... other assessment history items
+]
+```
+
+### GET /api/mentor/students/:studentId/prakriti-assessment
+
+Allows mentors to view a specific student's Prakriti assessment.
+
+**Response**
+```json
+{
+  "id": "string",
+  "studentId": "string",
+  "createdAt": "string (ISO date)",
+  "updatedAt": "string (ISO date)",
+  "answers": {
+    "1": "vata|pitta|kapha",
+    "2": "vata|pitta|kapha",
+    // ... other question answers
+  },
+  "result": {
+    "type": "vata|pitta|kapha|vata-pitta|pitta-kapha|vata-kapha|balanced",
+    "description": "string",
+    "recommendations": ["string", "string", ...]
   }
-  ```
+}
+```
 
-## Mission Submissions
+## Data Models
 
-### Get Submissions
-- **Endpoint:** `GET /api/mentor/missions/submissions`
-- **Description:** Get mission submissions for review
-- **Query Parameters:**
-  - `status`: Filter by status (pending, approved, rejected)
-  - `page`: Pagination
-- **Response:** Array of submission objects
+### PrakritiAssessment
+- id: string (unique identifier)
+- studentId: string (foreign key to User)
+- createdAt: Date
+- updatedAt: Date
+- answers: Record<string, 'vata' | 'pitta' | 'kapha'> (mapping of question IDs to selected answers)
+- result: {
+  - type: 'vata' | 'pitta' | 'kapha' | 'vata-pitta' | 'pitta-kapha' | 'vata-kapha' | 'balanced'
+  - description: string
+  - recommendations: string[]
+}
 
-### Review Submission
-- **Endpoint:** `PUT /api/mentor/missions/submissions/:submissionId`
-- **Description:** Review a mission submission
-- **Request Body:**
-  ```json
-  {
-    "status": "approved | rejected",
-    "feedback": "string",
-    "points": "number"
-  }
-  ```
+## Integration Notes
+
+1. The Prakriti assessment should be automatically analyzed on the backend to determine the dominant dosha(s) and provide appropriate recommendations.
+
+2. Assessment results should be stored to track changes in a student's Prakriti over time.
+
+3. Mentors should be able to view their students' Prakriti assessments to tailor their teaching approaches accordingly.
+
+4. The assessment should be available to students at any time, with a recommendation to complete it at the beginning of each school year.
