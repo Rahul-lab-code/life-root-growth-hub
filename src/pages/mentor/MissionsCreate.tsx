@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useLiferootAPI } from "@/hooks/useLiferootAPI";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface MissionData {
   title: string;
@@ -27,12 +27,16 @@ const MissionsCreate = () => {
   const [formData, setFormData] = useState<MissionData>({
     title: '',
     description: '',
-    type: '',
+    type: 'eco',
     objectives: '',
-    timeEstimate: '',
-    points: 0,
+    timeEstimate: '30 minutes',
+    points: 50,
     difficulty: 'medium',
   });
+
+  const handleInputChange = (field: keyof MissionData, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,17 +45,19 @@ const MissionsCreate = () => {
     try {
       await post('/api/mentor/missions', formData);
       
-      toast("Mission created successfully");
+      toast({
+        title: "Success",
+        description: "Mission created successfully"
+      });
       navigate("/mentor/missions");
     } catch (error) {
-      toast("Failed to create mission. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to create mission. Please try again."
+      });
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleInputChange = (field: keyof MissionData, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -63,7 +69,7 @@ const MissionsCreate = () => {
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Create New Mission</h1>
-          <p className="text-muted-foreground">Design a new learning mission</p>
+          <p className="text-muted-foreground">Add a new mission for students</p>
         </div>
       </div>
 
@@ -74,21 +80,20 @@ const MissionsCreate = () => {
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div className="space-y-2">
+              <div>
                 <label htmlFor="title" className="text-sm font-medium">Title</label>
                 <Input 
                   id="title" 
-                  placeholder="Enter mission title" 
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   required 
                 />
               </div>
               
-              <div className="space-y-2">
+              <div>
                 <label htmlFor="type" className="text-sm font-medium">Mission Type</label>
                 <Select 
-                  value={formData.type} 
+                  value={formData.type}
                   onValueChange={(value) => handleInputChange('type', value)}
                 >
                   <SelectTrigger>
@@ -102,47 +107,34 @@ const MissionsCreate = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <label htmlFor="description" className="text-sm font-medium">Description</label>
-                <Textarea id="description" placeholder="Enter mission description" className="min-h-[100px]" required />
+                <Textarea 
+                  id="description" 
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  className="min-h-[100px]" 
+                  required
+                />
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <label htmlFor="objectives" className="text-sm font-medium">Learning Objectives</label>
-                <Textarea id="objectives" placeholder="Enter learning objectives" className="min-h-[100px]" required />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="difficulty" className="text-sm font-medium">Difficulty</label>
-                <Select 
-                  value={formData.difficulty} 
-                  onValueChange={(value: 'easy' | 'medium' | 'hard') => handleInputChange('difficulty', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="points" className="text-sm font-medium">Points</label>
-                <Input 
-                  id="points" 
-                  type="number" 
-                  placeholder="Enter points value" 
-                  value={formData.points}
-                  onChange={(e) => handleInputChange('points', parseInt(e.target.value))}
-                  required 
+                <Textarea 
+                  id="objectives" 
+                  value={formData.objectives}
+                  onChange={(e) => handleInputChange('objectives', e.target.value)}
+                  className="min-h-[100px]" 
+                  required
                 />
               </div>
 
               <div className="flex justify-end gap-3">
-                <Button variant="outline" type="button" onClick={() => navigate("/mentor/missions")}>
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={() => navigate("/mentor/missions")}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>

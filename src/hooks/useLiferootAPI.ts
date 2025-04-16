@@ -1,6 +1,7 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from 'react';
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -45,8 +46,10 @@ export const useLiferootAPI = () => {
       return await response.json() as T;
     } catch (error) {
       if (!disableToast) {
-        toast("Error", {
-          description: error instanceof Error ? error.message : 'An unknown error occurred'
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : 'An unknown error occurred',
+          variant: "destructive"
         });
       }
       
@@ -85,8 +88,10 @@ export const useLiferootAPI = () => {
             setError(err instanceof Error ? err : new Error('An unknown error occurred'));
             
             if (!options.disableToast) {
-              toast("Error fetching data", {
-                description: err instanceof Error ? err.message : 'An unknown error occurred'
+              toast({
+                title: "Error",
+                description: err instanceof Error ? err.message : 'An unknown error occurred',
+                variant: "destructive"
               });
             }
           }

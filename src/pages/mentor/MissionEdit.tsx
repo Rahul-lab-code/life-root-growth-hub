@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useLiferootAPI } from "@/hooks/useLiferootAPI";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface MissionData {
   title: string;
@@ -42,7 +42,10 @@ const MissionEdit = () => {
         const data = await get<MissionData>(`/api/mentor/missions/${missionId}`);
         setFormData(data);
       } catch (error) {
-        toast("Failed to load mission details");
+        toast({
+          title: "Error",
+          description: "Failed to load mission details"
+        });
         navigate("/mentor/missions");
       } finally {
         setIsLoading(false);
@@ -61,10 +64,16 @@ const MissionEdit = () => {
     try {
       await put(`/api/mentor/missions/${missionId}`, formData);
       
-      toast("Mission updated successfully");
+      toast({
+        title: "Success",
+        description: "Mission updated successfully"
+      });
       navigate("/mentor/missions");
     } catch (error) {
-      toast("Failed to update mission. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to update mission. Please try again."
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -78,10 +87,16 @@ const MissionEdit = () => {
     try {
       await deleteMission(`/api/mentor/missions/${missionId}`);
       
-      toast("Mission deleted successfully");
+      toast({
+        title: "Success",
+        description: "Mission deleted successfully"
+      });
       navigate("/mentor/missions");
     } catch (error) {
-      toast("Failed to delete mission. Please try again.");
+      toast({
+        title: "Error", 
+        description: "Failed to delete mission. Please try again."
+      });
     }
   };
 
@@ -120,12 +135,20 @@ const MissionEdit = () => {
           <form onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label htmlFor="title" className="text-sm font-medium">Title</label>
-              <Input id="title" defaultValue="Example Mission Title" />
+              <Input 
+                id="title" 
+                value={formData.title}
+                onChange={(e) => handleInputChange('title', e.target.value)}
+                required
+              />
             </div>
             
             <div className="space-y-2">
               <label htmlFor="type" className="text-sm font-medium">Mission Type</label>
-              <Select defaultValue="eco">
+              <Select 
+                value={formData.type} 
+                onValueChange={(value) => handleInputChange('type', value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select mission type" />
                 </SelectTrigger>
@@ -141,8 +164,10 @@ const MissionEdit = () => {
               <label htmlFor="description" className="text-sm font-medium">Description</label>
               <Textarea 
                 id="description" 
-                defaultValue="Example mission description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
                 className="min-h-[100px]" 
+                required
               />
             </div>
 
@@ -150,8 +175,10 @@ const MissionEdit = () => {
               <label htmlFor="objectives" className="text-sm font-medium">Learning Objectives</label>
               <Textarea 
                 id="objectives" 
-                defaultValue="Example learning objectives"
+                value={formData.objectives}
+                onChange={(e) => handleInputChange('objectives', e.target.value)}
                 className="min-h-[100px]" 
+                required
               />
             </div>
 
