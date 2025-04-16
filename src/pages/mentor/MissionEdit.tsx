@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useLiferootAPI } from "@/hooks/useLiferootAPI";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface MissionData {
   title: string;
@@ -38,14 +39,10 @@ const MissionEdit = () => {
   useEffect(() => {
     const fetchMission = async () => {
       try {
-        const data = await get(`/api/mentor/missions/${missionId}`);
+        const data = await get<MissionData>(`/api/mentor/missions/${missionId}`);
         setFormData(data);
       } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load mission details",
-          variant: "destructive",
-        });
+        toast("Failed to load mission details");
         navigate("/mentor/missions");
       } finally {
         setIsLoading(false);
@@ -64,17 +61,10 @@ const MissionEdit = () => {
     try {
       await put(`/api/mentor/missions/${missionId}`, formData);
       
-      toast({
-        title: "Mission updated",
-        description: "Your changes have been saved successfully.",
-      });
+      toast("Mission updated successfully");
       navigate("/mentor/missions");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update mission. Please try again.",
-        variant: "destructive",
-      });
+      toast("Failed to update mission. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -88,17 +78,10 @@ const MissionEdit = () => {
     try {
       await deleteMission(`/api/mentor/missions/${missionId}`);
       
-      toast({
-        title: "Mission deleted",
-        description: "The mission has been deleted successfully.",
-      });
+      toast("Mission deleted successfully");
       navigate("/mentor/missions");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete mission. Please try again.",
-        variant: "destructive",
-      });
+      toast("Failed to delete mission. Please try again.");
     }
   };
 

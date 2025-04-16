@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useLiferootAPI } from "@/hooks/useLiferootAPI";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface MissionData {
   title: string;
@@ -40,17 +41,10 @@ const MissionsCreate = () => {
     try {
       await post('/api/mentor/missions', formData);
       
-      toast({
-        title: "Mission created",
-        description: "Your mission has been created successfully.",
-      });
+      toast("Mission created successfully");
       navigate("/mentor/missions");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create mission. Please try again.",
-        variant: "destructive",
-      });
+      toast("Failed to create mission. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
