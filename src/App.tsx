@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -73,8 +72,6 @@ const AppRoutes = () => {
     <Routes>
       {/* Public routes */}
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
-
-      {/* If authenticated, redirect to role-specific dashboard */}
       <Route path="/" element={<Index />} />
 
       {/* Admin routes */}
@@ -85,10 +82,9 @@ const AppRoutes = () => {
       }>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<AdminUsers />} />
-        <Route path="users/new" element={<AdminUsers />} />
+        <Route path="users/new" element={<UserCreate />} />
         <Route path="reports" element={<AdminReports />} />
         <Route path="settings" element={<AdminSettings />} />
-        <Route path="missions" element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
 
       {/* Mentor routes */}
@@ -103,9 +99,9 @@ const AppRoutes = () => {
         <Route path="messages" element={<MentorMessages />} />
         <Route path="messages/:userId" element={<MentorMessages />} />
         <Route path="missions" element={<MentorMissions />} />
-        <Route path="missions/new" element={<MentorMissions />} />
+        <Route path="missions/new" element={<MissionsCreate />} />
         <Route path="missions/:missionId" element={<MentorMissions />} />
-        <Route path="missions/:missionId/edit" element={<MentorMissions />} />
+        <Route path="missions/:missionId/edit" element={<MissionEdit />} />
         <Route path="profile" element={<MentorProfile />} />
       </Route>
 
