@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for the users
 const mockUsers = [
@@ -92,6 +93,7 @@ const getStatusColor = (status: string) => {
 const Users: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string | undefined>(undefined);
+  const navigate = useNavigate();
 
   const filteredUsers = mockUsers.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -110,7 +112,7 @@ const Users: React.FC = () => {
           <h1 className="text-2xl font-bold">Users</h1>
           <p className="text-muted-foreground">Manage all users on the platform</p>
         </div>
-        <Button className="mt-4 md:mt-0">
+        <Button className="mt-4 md:mt-0" onClick={() => navigate("/admin/users/new")}>
           <UserPlus className="h-4 w-4 mr-2" />
           Add New User
         </Button>
@@ -140,7 +142,7 @@ const Users: React.FC = () => {
                   <SelectValue placeholder="Filter by role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Roles</SelectItem>
+                  <SelectItem value="all">All Roles</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="mentor">Mentor</SelectItem>
                   <SelectItem value="student">Student</SelectItem>
