@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminUsers from "./pages/admin/Users";
 import AdminReports from "./pages/admin/Reports";
 import AdminSettings from "./pages/admin/Settings";
+import UserCreate from "./pages/admin/UserCreate";
 
 // Mentor pages
 import MentorDashboard from "./pages/mentor/Dashboard";
@@ -21,6 +23,8 @@ import MentorStudents from "./pages/mentor/Students";
 import MentorMessages from "./pages/mentor/Messages";
 import MentorMissions from "./pages/mentor/Missions";
 import MentorProfile from "./pages/mentor/Profile";
+import MissionsCreate from "./pages/mentor/MissionsCreate";
+import MissionEdit from "./pages/mentor/MissionEdit";
 
 // Student pages
 import StudentDashboard from "./pages/student/Dashboard";
