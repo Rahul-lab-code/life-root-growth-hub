@@ -12,7 +12,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from '@/components/ui/sidebar';
 import { 
   Home, 
@@ -26,21 +27,32 @@ import {
   Leaf, 
   Brain, 
   Heart,
-  Smile 
+  Smile,
+  Menu
 } from 'lucide-react';
 import AppLogo from './AppLogo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const AppSidebar: React.FC = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const { openMobile, setOpenMobile } = useSidebar();
 
   if (!currentUser) return null;
 
   const isActive = (path: string) => location.pathname.includes(path);
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const getMenuItems = (role: UserRole) => {
     switch (role) {
@@ -92,7 +104,7 @@ const AppSidebar: React.FC = () => {
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton 
                     className={isActive(item.path) ? 'bg-sidebar-accent' : ''}
-                    onClick={() => navigate(item.path)}
+                    onClick={() => handleNavigate(item.path)}
                   >
                     <item.icon className="h-5 w-5" />
                     <span>{item.title}</span>
